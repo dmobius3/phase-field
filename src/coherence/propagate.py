@@ -39,12 +39,13 @@ def _flat_velocity(rad, vobs, outer_frac: float = 0.34):
 
 
 def _eta_pair(rad, vobs, vgas, vdisk, vbul, v_c,
-              ratio_threshold: float = 1.2, flat_tol: float = 0.05):
+              ratio_threshold: float = 1.2, flat_tol: float = 0.05,
+              persistence: float = 0.8):
     L_f = float(coherence_length_kpc(v_c))
     g_obs = g_observed(vobs, rad)
     g_bar = g_baryonic(vgas, vdisk, vbul, rad, ml_disk=ML_DISK, ml_bul=0.7)
-    r_t = transition_radius(rad, g_obs, g_bar, ratio_threshold)
-    r_flat = flat_onset_radius(rad, vobs, v_c, flat_tol)
+    r_t = transition_radius(rad, g_obs, g_bar, ratio_threshold, persistence)
+    r_flat = flat_onset_radius(rad, vobs, v_c, flat_tol, persistence)
     eta_t = None if r_t is None else r_t / L_f
     eta_flat = None if r_flat is None else r_flat / L_f
     return eta_t, eta_flat
@@ -68,11 +69,13 @@ def _perturb(galaxy, rng, errors):
     return rad, vobs, vgas, vdisk, vbul, v_c
 
 
-def sigma_pred(v_c_grid=None, n_mc: int = 400, seed: int = 0, errors=None):
+def sigma_pred(v_c_grid=None, n_mc: int = 400, seed: int = 0, errors=None,
+               persistence: float = 0.8):
     """Estimate sigma_pred over a grid of synthetic galaxies.
 
-    Returns a dict with the eta_t, eta_flat, and pooled scatter bounds,
-    plus the inputs used, suitable for serialising to sigma_pred.json.
+    Reports both the scatter (std) and the bias (mean) of the fractional
+    eta deviation, since a one-sided onset ratchet shows up as bias. The
+    result dict is suitable for serialising to sigma_pred.json.
     """
     errors = SPARC_ERRORS if errors is None else errors
     if v_c_grid is None:
@@ -84,9 +87,11 @@ def sigma_pred(v_c_grid=None, n_mc: int = 400, seed: int = 0, errors=None):
         galaxy = make_galaxy("flat", v_c=float(v_c))
         eta_t0, eta_flat0 = _eta_pair(
             galaxy["rad"], galaxy["vobs"], galaxy["vgas"],
-            galaxy["vdisk"], galaxy["vbul"], galaxy["v_c"])
+            galaxy["vdisk"], galaxy["vbul"], galaxy["v_c"],
+            persistence=persistence)
         for _ in range(n_mc):
-            eta_t, eta_flat = _eta_pair(*_perturb(galaxy, rng, errors))
+            eta_t, eta_flat = _eta_pair(*_perturb(galaxy, rng, errors),
+                                        persistence=persistence)
             if eta_t is not None and eta_t0:
                 dev_t.append(eta_t / eta_t0 - 1.0)
             if eta_flat is not None and eta_flat0:
@@ -94,17 +99,23 @@ def sigma_pred(v_c_grid=None, n_mc: int = 400, seed: int = 0, errors=None):
 
     dev_t = np.asarray(dev_t, dtype=float)
     dev_flat = np.asarray(dev_flat, dtype=float)
-    pooled = np.concatenate([dev_t, dev_flat])
+    n_total = len(v_c_grid) * n_mc
     return {
-        "sigma_pred": float(np.std(pooled, ddof=1)),
+        "sigma_pred": float(np.std(dev_flat, ddof=1)),
         "sigma_pred_eta_t": float(np.std(dev_t, ddof=1)),
         "sigma_pred_eta_flat": float(np.std(dev_flat, ddof=1)),
+        "bias_eta_t": float(np.mean(dev_t)),
+        "bias_eta_flat": float(np.mean(dev_flat)),
+        "dropout_eta_t": float(1.0 - dev_t.size / n_total),
+        "dropout_eta_flat": float(1.0 - dev_flat.size / n_total),
         "n_realizations_eta_t": int(dev_t.size),
         "n_realizations_eta_flat": int(dev_flat.size),
         "n_mc_per_galaxy": int(n_mc),
         "seed": int(seed),
+        "persistence": float(persistence),
         "v_c_grid_kms": [float(v) for v in v_c_grid],
         "error_budget": dict(errors),
         "note": ("Fractional eta scatter from a representative SPARC "
-                 "error budget; equals the absolute scatter at eta = 1."),
+                 "error budget; equals the absolute scatter at eta = 1. "
+                 "sigma_pred is the eta_flat scatter, the binding case."),
     }

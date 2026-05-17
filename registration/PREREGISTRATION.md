@@ -33,11 +33,21 @@ Applied uniformly, from the SPARC catalog:
 ## Operational definitions
 
 - **Transition radius `r_t`**: smallest radius such that
-  `g_obs(r)/g_bar(r) >= 1.2` for all measured points at `r >= r_t`.
-  `r_t` is NOT defined by `g_obs = a_0` (that would make `r_t = L_f`
-  an arithmetic identity for flat curves).
+  `g_obs(r)/g_bar(r) >= 1.2` holds at r_t and at no less than the
+  persistence fraction `f` of measured points at `r >= r_t`. `r_t` is
+  NOT defined by `g_obs = a_0` (that would make `r_t = L_f` an
+  arithmetic identity for flat curves).
 - **Flat-onset radius `R_flat`**: smallest radius such that
-  `|v(r) - v_c|/v_c <= 0.05` for all measured points at `r >= R_flat`.
+  `|v(r) - v_c|/v_c <= 0.05` holds at R_flat and at no less than the
+  persistence fraction `f` of measured points at `r >= R_flat`.
+- **Persistence rule**: the onset is the smallest radius where the
+  condition holds at that radius and at a fraction `f` of the points
+  beyond it, not at every point. A strict "all points beyond" rule is a
+  one-sided ratchet: a single point displaced by measurement error trips
+  it and pushes the onset outward, never inward, biasing r_t and R_flat
+  high. The persistence rule removes the ratchet while keeping the
+  conceptual definition of a sustained transition. Primary `f = 0.80`,
+  swept in the sensitivity grid; the same `f` applies to r_t and R_flat.
 - **Trigger index** `T/T_c`: computed for every galaxy from its rotation
   curve, with no flat/rising pre-classification.
 - **Kinematic label (flat vs. rising)**: a galaxy is labeled `flat` if a
@@ -128,16 +138,17 @@ budget; frozen in `registration/sigma_pred.json` at the tag).
 
 ## Sensitivity grid
 
-The two analyst-chosen thresholds are swept over a 3x3 grid:
+The three analyst-chosen parameters are swept over a 3x3x3 grid:
 
 - `r_t` divergence ratio: 1.1, 1.2 (primary), 1.3.
 - `R_flat` flatness tolerance: 3%, 5% (primary), 7%.
+- persistence fraction `f`: 0.70, 0.80 (primary), 0.90.
 
 Registered stability criterion: the pass/fail verdict of every prediction
-above is unchanged across all nine cells of the grid. If any prediction
-flips its verdict between cells, the result is reported as
+above is unchanged across all twenty-seven cells of the grid. If any
+prediction flips its verdict between cells, the result is reported as
 threshold-sensitive and is not claimed as a confirmation, regardless of
-what the primary cell (1.2, 5%) shows.
+what the primary cell (1.2, 5%, 0.80) shows.
 
 ## Falsification
 
