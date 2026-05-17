@@ -1,0 +1,24 @@
+{
+  "title": "phase-field: A Pre-Registered SPARC Test of the Mode Identity Theory Coherence Scale",
+  "description": "Locked-pipeline blind analysis testing whether the Mode Identity Theory coherence scale L_f = v_c^2/a_0 behaves like a real galactic coherence radius across the SPARC sample of 175 disk galaxies, after controlling for ordinary size scaling. The repository contains the analysis pipeline, the frozen pre-registration (claims, algorithm thresholds, sample cuts, and the acceptance scatter bound sigma_pred), synthetic rotation-curve tests, and figure-generation scripts. The transition radius r_t and flat-onset radius R_flat are tested against L_f and against a family of null size, velocity, and mass scalings; the dimensionless ratios eta_t and eta_flat are the primary registered outcome.",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "MIT",
+  "version": "0.1.0",
+  "creators": [
+    {
+      "name": "Shatto, B.",
+      "affiliation": "Independent Researcher, St. Petersburg, FL, USA",
+      "orcid": "0009-0007-4419-1311"
+    }
+  ],
+  "keywords": [
+    "galaxy rotation curves",
+    "SPARC",
+    "coherence scale",
+    "radial acceleration relation",
+    "MOND",
+    "dark matter",
+    "pre-registration"
+  ]
+}

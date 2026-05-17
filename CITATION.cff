@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the paper and this archive."
+title: "phase-field: A Pre-Registered SPARC Test of the Mode Identity Theory Coherence Scale"
+type: software
+authors:
+  - family-names: Shatto
+    given-names: B.
+    affiliation: "Independent Researcher, St. Petersburg, FL, USA"
+    orcid: "https://orcid.org/0009-0007-4419-1311"
+version: 0.1.0
+date-released: "2026-05-17"
+license: MIT
+repository-code: "https://github.com/dmobius3/phase-field"
+keywords:
+  - galaxy rotation curves
+  - SPARC
+  - coherence scale
+  - radial acceleration relation
+  - MOND
+  - pre-registration
