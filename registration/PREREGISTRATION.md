@@ -43,17 +43,19 @@ Applied uniformly, from the SPARC catalog:
 
 ## Registered predictions
 
-1. **Transition radius.** `r_t` correlates linearly with `L_f`, slope
-   approximately 1.
-2. **Flat-onset radius.** `R_flat` correlates linearly with `L_f`, slope
-   approximately 1, intercept consistent with zero, AND tracks `L_f` more
-   tightly than it tracks any null model below (partial correlation).
+1. **Transition radius.** `r_t` correlates linearly with `L_f`.
+2. **Flat-onset radius.** `R_flat` correlates linearly with `L_f`, and
+   tracks `L_f` more tightly than it tracks any null model below.
 3. **Primary outcome: dimensionless ratios.** `eta_t = r_t/L_f` and
-   `eta_flat = R_flat/L_f` cluster around order unity with scatter
-   consistent with `sigma_pred`.
+   `eta_flat = R_flat/L_f` cluster near unity, with scatter explained by
+   measurement error.
 4. **Trigger index as predictor.** `T/T_c`, computed without kinematic
    pre-classification, predicts which galaxies have flat versus rising
    rotation curves.
+
+Each prediction has a quantitative pass/fail criterion in the next
+section. The words "approximately," "near," and "stable" are defined
+numerically there and nowhere else.
 
 ## Null models
 
@@ -69,21 +71,59 @@ physical content.
 
 ## Acceptance criteria
 
-- **Ratios (primary).** `eta_t` and `eta_flat` are consistent with
-  clustering at unity within `sigma_pred`.
-  `sigma_pred = TBD` (computed in Phase 0 from a representative SPARC
-  error budget; see `registration/sigma_pred.json`, frozen at the tag).
-- **Threshold.** Among quality-filtered flat-curve galaxies, no more than
-  5% may fall below `T/T_c = 1`. Exceeding 5% falsifies the closure
-  identity.
+Every interval and test statistic below is frozen at the tag. The numeric
+values are provisional in this draft and may be adjusted before the tag;
+once frozen, nothing changes after data contact.
+
+**Prediction 1 (transition radius).** Ordinary-least-squares fit of `r_t`
+on `L_f`: registered slope interval `[0.7, 1.3]`, registered intercept
+consistent with zero at 2 sigma of the fit. Spearman correlation
+significant at `p < 0.01`.
+
+**Prediction 2 (flat-onset radius).** OLS fit of `R_flat` on `L_f`:
+registered slope interval `[0.7, 1.3]`, intercept consistent with zero at
+2 sigma. AND, for the null-model comparison: the partial correlation of
+`R_flat` with `L_f`, controlling for each null model in turn, remains
+significant at `p < 0.01`; and the Spearman rho of `R_flat` with `L_f`
+exceeds that of every null model.
+
+**Prediction 3 (dimensionless ratios, primary outcome).** Two independent
+criteria, both required to pass:
+
+- *Location.* The sample median of `eta_t`, and of `eta_flat`, lies within
+  `[0.5, 2.0]`; the 95% bootstrap confidence interval of each median also
+  lies within `[0.5, 2.0]`. This tests that the velocity-to-length
+  constant is `1/a_0`.
+- *Scatter.* A one-sided chi-squared test of the sample variance of each
+  `eta` against `sigma_pred^2`. The criterion fails if the observed
+  scatter exceeds `sigma_pred` at `p < 0.05`. This tests that measurement
+  error explains the spread.
+
+**Prediction 4 (trigger index as predictor).** The continuous index
+`T/T_c` is scored against the binary kinematic label (flat vs. rising) by
+ROC AUC. Registered criterion: `AUC >= 0.7`. Reported alongside, but not
+as the pass/fail metric: the 2x2 contingency table at the `T/T_c = 1`
+decision boundary with a Fisher exact test.
+
+**Threshold (closure identity).** Among quality-filtered flat-curve
+galaxies, no more than 5% may fall below `T/T_c = 1`. Exceeding 5%
+falsifies the closure identity.
+
+`sigma_pred = TBD` (computed in Phase 0 from a representative SPARC error
+budget; frozen in `registration/sigma_pred.json` at the tag).
 
 ## Sensitivity grid
 
-The two analyst-chosen thresholds are swept; the registered conclusions
-must be stable across the grid:
+The two analyst-chosen thresholds are swept over a 3x3 grid:
 
 - `r_t` divergence ratio: 1.1, 1.2 (primary), 1.3.
 - `R_flat` flatness tolerance: 3%, 5% (primary), 7%.
+
+Registered stability criterion: the pass/fail verdict of every prediction
+above is unchanged across all nine cells of the grid. If any prediction
+flips its verdict between cells, the result is reported as
+threshold-sensitive and is not claimed as a confirmation, regardless of
+what the primary cell (1.2, 5%) shows.
 
 ## Falsification
 
