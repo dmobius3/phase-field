@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coherence"
+version = "0.1.0"
+description = "Pre-registered SPARC test of the Mode Identity Theory coherence scale"
+requires-python = ">=3.9"
+readme = "README.md"
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.24,<2.0",
+    "scipy>=1.10",
+    "astropy>=6.0",
+    "pandas>=2.0",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
