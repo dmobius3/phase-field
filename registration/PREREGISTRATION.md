@@ -40,6 +40,13 @@ Applied uniformly, from the SPARC catalog:
   `|v(r) - v_c|/v_c <= 0.05` for all measured points at `r >= R_flat`.
 - **Trigger index** `T/T_c`: computed for every galaxy from its rotation
   curve, with no flat/rising pre-classification.
+- **Kinematic label (flat vs. rising)**: a galaxy is labeled `flat` if a
+  finite `R_flat` exists within the measured radial range and its SPARC
+  quality flag is 1 or 2; otherwise `rising`. This label is the ground
+  truth for prediction 4. It is derived from the rotation curve and the
+  SPARC quality flag only, never from `T/T_c`, and is assigned before any
+  ROC curve is computed. Using the trigger index to set the label would
+  make prediction 4 circular.
 
 ## Registered predictions
 
@@ -78,14 +85,20 @@ once frozen, nothing changes after data contact.
 **Prediction 1 (transition radius).** Ordinary-least-squares fit of `r_t`
 on `L_f`: registered slope interval `[0.7, 1.3]`, registered intercept
 consistent with zero at 2 sigma of the fit. Spearman correlation
-significant at `p < 0.01`.
+significant at `p < 0.01`. Both `r_t` and `L_f` carry measurement error,
+so OLS is subject to regression dilution that biases the slope toward
+zero (typical SPARC uncertainties pull a true unit slope to roughly
+0.85). OLS is the registered method, and the `[0.7, 1.3]` interval is set
+wide enough to absorb this bias. Orthogonal-distance regression is
+reported as a robustness check, not as the registered gate.
 
 **Prediction 2 (flat-onset radius).** OLS fit of `R_flat` on `L_f`:
 registered slope interval `[0.7, 1.3]`, intercept consistent with zero at
 2 sigma. AND, for the null-model comparison: the partial correlation of
 `R_flat` with `L_f`, controlling for each null model in turn, remains
 significant at `p < 0.01`; and the Spearman rho of `R_flat` with `L_f`
-exceeds that of every null model.
+exceeds that of every null model. The OLS regression-dilution note in
+prediction 1 applies here as well.
 
 **Prediction 3 (dimensionless ratios, primary outcome).** Two independent
 criteria, both required to pass:
@@ -100,7 +113,8 @@ criteria, both required to pass:
   error explains the spread.
 
 **Prediction 4 (trigger index as predictor).** The continuous index
-`T/T_c` is scored against the binary kinematic label (flat vs. rising) by
+`T/T_c` is scored against the binary kinematic label (flat vs. rising;
+defined operationally above and frozen independently of `T/T_c`) by
 ROC AUC. Registered criterion: `AUC >= 0.7`. Reported alongside, but not
 as the pass/fail metric: the 2x2 contingency table at the `T/T_c = 1`
 decision boundary with a Fisher exact test.
