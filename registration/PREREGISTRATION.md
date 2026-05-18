@@ -29,6 +29,15 @@ Applied uniformly, from the SPARC catalog:
 - Exclude: rising or falling rotation curves at the last measured point
   (for the radius-correlation tests; rising-curve galaxies are retained
   as a separate sub-population for the threshold-prediction test).
+- R_flat analysis only: include a galaxy in the R_flat / eta_flat
+  analysis only if its representative per-point fractional velocity
+  error errV/v_c < 0.03. R_flat is biased and unreliable when per-point
+  noise approaches the 5% flatness tolerance, as the sigma_pred Monte
+  Carlo showed. SPARC errV/v_c is largest in the low-v_c tail, so this
+  cut trims low-mass dwarfs from the eta_flat analysis only. It does not
+  affect r_t or the threshold-prediction test, which use the full
+  quality-filtered sample. The trimmed eta_flat sub-sample size is
+  reported.
 
 ## Operational definitions
 

@@ -1,0 +1,35 @@
+{
+  "sigma_pred": 0.2557628950585104,
+  "sigma_pred_eta_t": 0.3211757703263851,
+  "sigma_pred_eta_flat": 0.2557628950585104,
+  "bias_eta_t": -0.1015759156826806,
+  "bias_eta_flat": -0.17777864728175155,
+  "n_realizations_eta_t": 24000,
+  "n_realizations_eta_flat": 15991,
+  "n_mc_per_galaxy": 2000,
+  "seed": 0,
+  "persistence": 0.8,
+  "rflat_measurability_cut": 0.03,
+  "n_galaxies_total": 12,
+  "n_galaxies_rflat_measurable": 8,
+  "v_c_grid_kms": [
+    60.0,
+    80.0,
+    100.0,
+    120.0,
+    140.0,
+    160.0,
+    180.0,
+    200.0,
+    220.0,
+    240.0,
+    260.0,
+    280.0
+  ],
+  "error_budget": {
+    "distance_frac": 0.1,
+    "inclination_deg": 5.0,
+    "errV_kms": 4.0
+  },
+  "note": "Fractional eta scatter from a representative SPARC error budget; equals the absolute scatter at eta = 1. sigma_pred is the eta_flat scatter over measurable galaxies, the binding case."
+}

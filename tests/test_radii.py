@@ -1,6 +1,7 @@
 import numpy as np
 
-from coherence.radii import flat_onset_radius, transition_radius
+from coherence.radii import (flat_onset_radius, rflat_measurable,
+                             transition_radius)
 
 
 def test_transition_radius_simple_onset():
@@ -53,3 +54,10 @@ def test_flat_onset_radius_none_for_rising_curve():
     rad = np.array([1.0, 2.0, 3.0])
     v = np.array([50.0, 60.0, 70.0])
     assert flat_onset_radius(rad, v, 100.0, 0.05) is None
+
+
+def test_rflat_measurability_cut():
+    # errV/v_c must sit below 0.03 for R_flat to be measurable.
+    assert rflat_measurable(4.0, 200.0)        # 2.0% -> measurable
+    assert not rflat_measurable(4.0, 100.0)    # 4.0% -> not measurable
+    assert not rflat_measurable(4.0, 133.3)    # 3.0% -> at the cut, excluded

@@ -19,6 +19,7 @@ from __future__ import annotations
 import numpy as np
 
 DEFAULT_PERSISTENCE = 0.8
+RFLAT_MEASURABILITY = 0.03  # max errV/v_c for R_flat to be measurable
 
 
 def _persistence_onset(rad, condition, persistence: float = DEFAULT_PERSISTENCE):
@@ -56,3 +57,15 @@ def flat_onset_radius(rad, v, v_c, tol: float = 0.05,
     """
     v = np.asarray(v, dtype=float)
     return _persistence_onset(rad, np.abs(v - v_c) / v_c <= tol, persistence)
+
+
+def rflat_measurable(errV, v_c, max_fraction: float = RFLAT_MEASURABILITY):
+    """Whether R_flat is measurable for a galaxy.
+
+    The representative per-point fractional velocity error errV / v_c
+    must sit below ``max_fraction`` (comfortably under the flatness
+    tolerance). When per-point noise approaches the tolerance, R_flat is
+    biased high and is not reported. ``errV`` and ``v_c`` share a unit.
+    """
+    return (errV / v_c) < max_fraction
+
