@@ -68,9 +68,10 @@ Applied uniformly, from the SPARC catalog:
 - **Trigger index** `T/T_c`: computed for every galaxy from its rotation
   curve, with no flat/rising pre-classification.
 - **Kinematic label (flat vs. rising)**: a galaxy is labeled `flat` if a
-  finite `R_flat` exists within the measured radial range and its SPARC
-  quality flag is 1 or 2; otherwise `rising`. This label is the ground
-  truth for prediction 4. It is derived from the rotation curve and the
+  finite `R_flat` exists within the measured radial range, evaluated at
+  the primary-cell parameters (5% flatness tolerance, persistence
+  `f = 0.80`), and its SPARC quality flag is 1 or 2; otherwise `rising`.
+  This label is the ground truth for prediction 4. It is derived from the rotation curve and the
   SPARC quality flag only, never from `T/T_c`, and is assigned before any
   ROC curve is computed. Using the trigger index to set the label would
   make prediction 4 circular.
@@ -190,6 +191,15 @@ above is unchanged across all twenty-seven cells of the grid. If any
 prediction flips its verdict between cells, the result is reported as
 threshold-sensitive and is not claimed as a confirmation, regardless of
 what the primary cell (1.2, 5%, 0.80) shows.
+
+Kinematic labels (flat vs. rising) are frozen at the primary-cell
+parameters and held constant across all twenty-seven cells. `R_flat`
+existence depends on the flatness tolerance and the persistence fraction;
+letting the labels move with the grid would shift prediction 4's ground
+truth, so the ROC AUC could change because the labels moved rather than
+because the trigger index did. With the labels fixed, the grid tests the
+trigger index, predictions 1-3, and the closure-identity count against a
+stable target.
 
 ## Falsification
 
