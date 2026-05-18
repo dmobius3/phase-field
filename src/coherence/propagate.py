@@ -24,7 +24,7 @@ import numpy as np
 from .radii import (RFLAT_MEASURABILITY, flat_onset_radius, rflat_measurable,
                     transition_radius)
 from .scales import coherence_length_kpc, g_baryonic, g_observed
-from .synthetic import ML_DISK, make_galaxy
+from .synthetic import ML_DISK, FLAT_SHAPES, population
 
 # Representative SPARC uncertainties (Lelli, McGaugh & Schombert 2016).
 # errV is an absolute per-point velocity error; the flat velocity is
@@ -73,24 +73,38 @@ def _perturb(galaxy, rng, errors):
     return rad, vobs, vgas, vdisk, vbul, v_c
 
 
+def _summary(dev):
+    """Bias (mean) and scatter (std) of a deviation list."""
+    dev = np.asarray(dev, dtype=float)
+    if dev.size < 2:
+        return {"bias": None, "scatter": None, "n": int(dev.size)}
+    return {"bias": float(np.mean(dev)), "scatter": float(np.std(dev, ddof=1)),
+            "n": int(dev.size)}
+
+
 def sigma_pred(v_c_grid=None, n_mc: int = 400, seed: int = 0, errors=None,
                persistence: float = 0.8):
-    """Estimate sigma_pred over a grid of synthetic galaxies.
+    """Estimate sigma_pred over the broadened synthetic population
+    (FLAT_SHAPES x ONSET_GRID x v_c_grid).
 
     eta_flat statistics are restricted to galaxies passing the R_flat
-    measurability cut; eta_t statistics use the full grid. Reports both
-    scatter (std) and bias (mean) of the fractional eta deviation.
+    measurability cut; eta_t statistics use the full population. Reports
+    bias and scatter both pooled and per shape, so the stability of the
+    measurement bias across curve morphology can be judged.
     """
     errors = SPARC_ERRORS if errors is None else errors
     if v_c_grid is None:
-        v_c_grid = np.linspace(60.0, 280.0, 12)
+        v_c_grid = np.linspace(90.0, 280.0, 8)
     rng = np.random.default_rng(seed)
-    dev_t, dev_flat = [], []
+    dev_t = {s: [] for s in FLAT_SHAPES}
+    dev_flat = {s: [] for s in FLAT_SHAPES}
     n_measurable = 0
+    n_total = 0
 
-    for v_c in v_c_grid:
-        galaxy = make_galaxy("flat", v_c=float(v_c))
-        measurable = rflat_measurable(errors["errV_kms"], float(v_c))
+    for galaxy in population(v_c_grid):
+        shape = galaxy["shape"]
+        n_total += 1
+        measurable = rflat_measurable(errors["errV_kms"], galaxy["v_c"])
         n_measurable += int(measurable)
         eta_t0, eta_flat0 = _eta_pair(
             galaxy["rad"], galaxy["vobs"], galaxy["vgas"],
@@ -100,30 +114,43 @@ def sigma_pred(v_c_grid=None, n_mc: int = 400, seed: int = 0, errors=None,
             eta_t, eta_flat = _eta_pair(*_perturb(galaxy, rng, errors),
                                         persistence=persistence)
             if eta_t is not None and eta_t0:
-                dev_t.append(eta_t / eta_t0 - 1.0)
+                dev_t[shape].append(eta_t / eta_t0 - 1.0)
             if measurable and eta_flat is not None and eta_flat0:
-                dev_flat.append(eta_flat / eta_flat0 - 1.0)
+                dev_flat[shape].append(eta_flat / eta_flat0 - 1.0)
 
-    dev_t = np.asarray(dev_t, dtype=float)
-    dev_flat = np.asarray(dev_flat, dtype=float)
+    all_t = [d for s in FLAT_SHAPES for d in dev_t[s]]
+    all_flat = [d for s in FLAT_SHAPES for d in dev_flat[s]]
+    by_shape = {s: {"eta_t": _summary(dev_t[s]),
+                    "eta_flat": _summary(dev_flat[s])} for s in FLAT_SHAPES}
+    flat_biases = [by_shape[s]["eta_flat"]["bias"] for s in FLAT_SHAPES
+                   if by_shape[s]["eta_flat"]["bias"] is not None]
+    pooled_flat = _summary(all_flat)
+    pooled_t = _summary(all_t)
+
     return {
-        "sigma_pred": float(np.std(dev_flat, ddof=1)),
-        "sigma_pred_eta_t": float(np.std(dev_t, ddof=1)),
-        "sigma_pred_eta_flat": float(np.std(dev_flat, ddof=1)),
-        "bias_eta_t": float(np.mean(dev_t)),
-        "bias_eta_flat": float(np.mean(dev_flat)),
-        "n_realizations_eta_t": int(dev_t.size),
-        "n_realizations_eta_flat": int(dev_flat.size),
+        "sigma_pred": pooled_flat["scatter"],
+        "sigma_pred_eta_flat": pooled_flat["scatter"],
+        "sigma_pred_eta_t": pooled_t["scatter"],
+        "bias_eta_flat": pooled_flat["bias"],
+        "bias_eta_t": pooled_t["bias"],
+        "bias_eta_flat_by_shape": {s: by_shape[s]["eta_flat"]["bias"]
+                                   for s in FLAT_SHAPES},
+        "bias_eta_flat_shape_spread": ([float(min(flat_biases)),
+                                        float(max(flat_biases))]
+                                       if flat_biases else None),
+        "by_shape": by_shape,
+        "n_realizations_eta_t": int(len(all_t)),
+        "n_realizations_eta_flat": int(len(all_flat)),
         "n_mc_per_galaxy": int(n_mc),
         "seed": int(seed),
         "persistence": float(persistence),
         "rflat_measurability_cut": float(RFLAT_MEASURABILITY),
-        "n_galaxies_total": int(len(v_c_grid)),
+        "n_galaxies_total": int(n_total),
         "n_galaxies_rflat_measurable": int(n_measurable),
         "v_c_grid_kms": [float(v) for v in v_c_grid],
         "error_budget": dict(errors),
         "note": ("Fractional eta scatter from a representative SPARC "
-                 "error budget; equals the absolute scatter at eta = 1. "
-                 "sigma_pred is the eta_flat scatter over measurable "
-                 "galaxies, the binding case."),
+                 "error budget over a broadened synthetic population; "
+                 "equals the absolute scatter at eta = 1. sigma_pred is "
+                 "the pooled eta_flat scatter over measurable galaxies."),
     }

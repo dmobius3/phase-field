@@ -1,29 +1,72 @@
 {
-  "sigma_pred": 0.2557628950585104,
-  "sigma_pred_eta_t": 0.3211757703263851,
-  "sigma_pred_eta_flat": 0.2557628950585104,
-  "bias_eta_t": -0.1015759156826806,
-  "bias_eta_flat": -0.17777864728175155,
-  "n_realizations_eta_t": 24000,
-  "n_realizations_eta_flat": 15991,
+  "sigma_pred": 0.44255664501967706,
+  "sigma_pred_eta_flat": 0.44255664501967706,
+  "sigma_pred_eta_t": 0.34583961621030657,
+  "bias_eta_flat": -0.058340771144386454,
+  "bias_eta_t": -0.13759321691803675,
+  "bias_eta_flat_by_shape": {
+    "sharp": 0.023829735201131134,
+    "gradual": -0.16575880581509556,
+    "bumpy": -0.03235375477440318
+  },
+  "bias_eta_flat_shape_spread": [
+    -0.16575880581509556,
+    0.023829735201131134
+  ],
+  "by_shape": {
+    "sharp": {
+      "eta_t": {
+        "bias": -0.27812489051635003,
+        "scatter": 0.38323845199245826,
+        "n": 48000
+      },
+      "eta_flat": {
+        "bias": 0.023829735201131134,
+        "scatter": 0.20385195050121857,
+        "n": 35990
+      }
+    },
+    "gradual": {
+      "eta_t": {
+        "bias": -0.06871157858742535,
+        "scatter": 0.30485361312818743,
+        "n": 48000
+      },
+      "eta_flat": {
+        "bias": -0.16575880581509556,
+        "scatter": 0.3015729531579913,
+        "n": 35991
+      }
+    },
+    "bumpy": {
+      "eta_t": {
+        "bias": -0.06594318165033496,
+        "scatter": 0.2989723922952915,
+        "n": 48000
+      },
+      "eta_flat": {
+        "bias": -0.03235375477440318,
+        "scatter": 0.6656891136046781,
+        "n": 34970
+      }
+    }
+  },
+  "n_realizations_eta_t": 144000,
+  "n_realizations_eta_flat": 106951,
   "n_mc_per_galaxy": 2000,
   "seed": 0,
   "persistence": 0.8,
   "rflat_measurability_cut": 0.03,
-  "n_galaxies_total": 12,
-  "n_galaxies_rflat_measurable": 8,
+  "n_galaxies_total": 72,
+  "n_galaxies_rflat_measurable": 54,
   "v_c_grid_kms": [
-    60.0,
-    80.0,
-    100.0,
-    120.0,
-    140.0,
-    160.0,
-    180.0,
-    200.0,
-    220.0,
-    240.0,
-    260.0,
+    90.0,
+    117.14285714285714,
+    144.28571428571428,
+    171.42857142857144,
+    198.57142857142856,
+    225.71428571428572,
+    252.85714285714286,
     280.0
   ],
   "error_budget": {
@@ -31,5 +74,5 @@
     "inclination_deg": 5.0,
     "errV_kms": 4.0
   },
-  "note": "Fractional eta scatter from a representative SPARC error budget; equals the absolute scatter at eta = 1. sigma_pred is the eta_flat scatter over measurable galaxies, the binding case."
+  "note": "Fractional eta scatter from a representative SPARC error budget over a broadened synthetic population; equals the absolute scatter at eta = 1. sigma_pred is the pooled eta_flat scatter over measurable galaxies."
 }
