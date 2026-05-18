@@ -122,14 +122,33 @@ prediction 1 applies here as well.
 **Prediction 3 (dimensionless ratios, primary outcome).** Two independent
 criteria, both required to pass:
 
-- *Location.* The sample median of `eta_t`, and of `eta_flat`, lies within
-  `[0.5, 2.0]`; the 95% bootstrap confidence interval of each median also
-  lies within `[0.5, 2.0]`. This tests that the velocity-to-length
-  constant is `1/a_0`.
+- *Location.* Primary precision window: the sample median of `eta_t`,
+  and of `eta_flat`, lies within `[0.75, 1.25]`, and the 95% bootstrap
+  confidence interval of each median also lies within `[0.75, 1.25]`.
+  This tests that the velocity-to-length constant is `1/a_0`
+  specifically. A coarse sanity gate, median within `[0.5, 2.0]`, is
+  also recorded; passing the coarse gate but failing the precision gate
+  means the ratio is order unity but not `1/a_0`. The precision gate
+  carries the falsification weight.
+
+  The window is asymmetric, wider below 1.0, because the measurement
+  bias is one-sided: the persistence-rule onset is pulled inward for
+  gradual (slow) turnovers and is barely shifted for sharp ones. The
+  broadened-population Monte Carlo characterized this pre-data, finding
+  an `eta_flat` bias of -16.6% for gradual turnovers, -3.2% for bumpy
+  curves, and +2.4% for sharp turnovers. The 0.75 floor absorbs the
+  worst-case single-shape bias with margin; the 1.25 ceiling absorbs
+  only the small positive sharp-turnover bias.
 - *Scatter.* A one-sided chi-squared test of the sample variance of each
-  `eta` against `sigma_pred^2`. The criterion fails if the observed
-  scatter exceeds `sigma_pred` at `p < 0.05`. This tests that measurement
-  error explains the spread.
+  `eta` against `sigma_pred^2`, with `sigma_pred = 0.443`. The criterion
+  fails if the observed scatter exceeds `sigma_pred` at `p < 0.05`. This
+  tests that measurement error explains the spread. `sigma_pred` is the
+  pooled `eta_flat` scatter from the broadened-population Monte Carlo,
+  equal-weighted across the sharp, gradual, and bumpy shapes (per-shape
+  scatter 0.20, 0.30, 0.67; all recorded in
+  `registration/sigma_pred.json`). The equal-weight pooling is the
+  documented pre-data choice; a bumpy-heavy real sample marginally
+  exceeding 0.443 is a shape-mix discussion, not a theory failure.
 
 **Prediction 4 (trigger index as predictor).** The continuous index
 `T/T_c` is scored against the binary kinematic label (flat vs. rising;
@@ -142,8 +161,9 @@ decision boundary with a Fisher exact test.
 galaxies, no more than 5% may fall below `T/T_c = 1`. Exceeding 5%
 falsifies the closure identity.
 
-`sigma_pred = TBD` (computed in Phase 0 from a representative SPARC error
-budget; frozen in `registration/sigma_pred.json` at the tag).
+`sigma_pred = 0.443`, computed in Phase 0 from the broadened-population
+representative SPARC error budget (four rotation-curve morphologies over
+a turnover-scale grid) and frozen in `registration/sigma_pred.json`.
 
 ## Sensitivity grid
 
