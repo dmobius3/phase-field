@@ -43,7 +43,9 @@ PRECISION_WINDOW = (0.75, 1.25)
 COARSE_GATE = (0.5, 2.0)
 AUC_MIN = 0.7
 CLOSURE_MAX_BELOW = 0.05  # max fraction of flat-curve galaxies with T/T_c < 1
-ERRV_KMS = 4.0  # representative per-point error; Phase 1 may use per-galaxy errV
+ERRV_KMS = 4.0  # registered fixed representative per-point error (km/s).
+# The R_flat measurability cut uses this fixed value, not per-galaxy errV,
+# so the sample selection stays pre-data (see PREREGISTRATION.md sample cuts).
 MIN_FIT = 10    # minimum galaxies for a correlation fit
 
 # SPARC master-table column names. VERIFY against the .mrt header in

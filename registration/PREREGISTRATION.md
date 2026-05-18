@@ -32,14 +32,20 @@ Applied uniformly, from the SPARC catalog:
   as a separate sub-population for the threshold-prediction test
   (prediction 4).
 - R_flat analysis only: include a galaxy in the R_flat / eta_flat
-  analysis only if its representative per-point fractional velocity
-  error errV/v_c < 0.03. R_flat is biased and unreliable when per-point
-  noise approaches the 5% flatness tolerance, as the sigma_pred Monte
-  Carlo showed. SPARC errV/v_c is largest in the low-v_c tail, so this
-  cut trims low-mass dwarfs from the eta_flat analysis only. It does not
-  affect r_t or the threshold-prediction test, which use the full
-  quality-filtered sample. The trimmed eta_flat sub-sample size is
-  reported.
+  analysis only if `errV/v_c < 0.03`, where `errV = 4 km/s` is a fixed
+  representative per-point velocity error (Lelli et al. 2016). With the
+  fixed `errV` this is a pre-data cut, equivalent to `v_c > 133 km/s`,
+  that selects the registered sub-sample without touching the data.
+  Per-galaxy `errV` is deliberately not used for the registered cut:
+  that would make sample selection data-dependent and unwind the blind
+  analysis. The per-galaxy-`errV` version is run only as a post-hoc
+  robustness check, labeled as such. R_flat is biased and unreliable
+  when per-point noise approaches the 5% flatness tolerance, as the
+  sigma_pred Monte Carlo showed; SPARC errV/v_c is largest in the
+  low-v_c tail, so this cut trims low-mass dwarfs from the eta_flat
+  analysis only. It does not affect r_t or the threshold-prediction
+  test, which use the full quality-filtered sample. The trimmed
+  eta_flat sub-sample size is reported.
 
 ## Operational definitions
 
@@ -165,7 +171,11 @@ falsifies the closure identity.
 
 `sigma_pred = 0.443`, computed in Phase 0 from the broadened-population
 representative SPARC error budget (four rotation-curve morphologies over
-a turnover-scale grid) and frozen in `registration/sigma_pred.json`.
+a turnover-scale grid) and frozen in `registration/sigma_pred.json`. The
+value is rounded to three significant figures: the Monte Carlo produced
+0.44256, and its roughly 10% uncertainty from the finite synthetic
+population and the equal-weight shape assumption does not warrant more
+precision.
 
 ## Sensitivity grid
 
