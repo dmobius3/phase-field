@@ -1,19 +1,25 @@
 """Phase-field trigger index T / T_c.
 
-Operational definition. The trigger index is
+The MIT framework (hubble-tension.md, section II) defines the trigger
+index as
 
     T = (2 / (c^2 L_f)) * integral_0^{L_f} Phi_rel(l) dl,
 
-with ``Phi_rel(l) = v(l)^2``, the squared circular velocity at radius l.
-For a flat rotation curve v == v_c this gives T = 2 v_c^2 / c^2, and with
-T_c = 2 xi v_c^2 / c^2 it reproduces the closure-identity result
-T / T_c = 1 / xi. For a rising curve the inner v(l) < v_c, so the index
-falls below 1 / xi: the index genuinely tracks curve shape rather than
-restating it.
+with Phi_rel(l) = Phi(L_f) - Phi(l), the gauge-invariant potential
+difference from the coherence boundary, where Phi is the potential of
+the observed rotation curve, d Phi / dr = v(r)^2 / r.
 
-The choice Phi_rel(l) = v(l)^2 is the operational reading of the
-phase-field potential integral. It should be checked against the MIT
-framework before the pre-registration tag is cut.
+Switching the order of integration reduces the trigger integral exactly,
+for any rotation curve, to a single integral of the squared velocity:
+
+    integral_0^{L_f} Phi_rel(l) dl = integral_0^{L_f} v(l)^2 dl,
+
+so this module integrates v(l)^2 directly. ``v`` is the observed
+rotation velocity and ``v_c`` the observed flat velocity. For a flat
+curve v == v_c this gives T = 2 v_c^2 / c^2 and, with
+T_c = 2 xi v_c^2 / c^2, the closure identity T / T_c = 1 / xi. For a
+rising curve the inner v(l) is below v_c, so the trigger index falls
+below 1 / xi: it tracks curve shape rather than restating it.
 """
 
 from __future__ import annotations

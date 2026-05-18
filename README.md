@@ -53,9 +53,14 @@ genuine pre-registered test against unseen data is Euclid DR1. See
     python -m venv venv && source venv/bin/activate
     pip install -r requirements.txt
     pytest                          # synthetic-curve tests (no data needed)
-    python scripts/fetch_data.py    # Phase 1: download SPARC from upstream
+    python scripts/fetch_data.py --confirm-data-contact   # Phase 1: download SPARC
     python scripts/run_pipeline.py
     python scripts/make_figures.py
+
+The `--confirm-data-contact` flag on `fetch_data.py` is the explicit
+Phase 0 / Phase 1 boundary: the script refuses to run without it, so
+cloning the repository and running the scripts cannot trigger data
+contact by accident.
 
 ## Data
 

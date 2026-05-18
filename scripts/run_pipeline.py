@@ -78,6 +78,11 @@ def load_sample():
             "R_d": float(row[COL["rdisk"]]),
             "R_eff": float(row[COL["reff"]]),
             "R_last": float(rad[-1]),
+            # M_b: gas (1.33 M_HI) plus a single-Upsilon stellar mass
+            # (0.5 x total 3.6um light). A luminosity-based baryonic-mass
+            # PROXY used only for the M_b null-model scalings, not the
+            # g_bar mass model, which decomposes disk and bulge with
+            # Y_disk = 0.5 and Y_bul = 0.7 separately.
             "M_b": 1.33 * float(row[COL["mhi"]]) + 0.5 * float(row[COL["lum"]]),
         })
     return records
