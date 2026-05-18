@@ -2,6 +2,8 @@
 
 A pre-registered SPARC test of the Mode Identity Theory coherence scale.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20271702.svg)](https://doi.org/10.5281/zenodo.20271702)
+
 ## What this is
 
 Mode Identity Theory (MIT) proposes a galactic coherence scale
