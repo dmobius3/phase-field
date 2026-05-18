@@ -49,6 +49,15 @@ Applied uniformly, from the SPARC catalog:
 
 ## Operational definitions
 
+- **Baryonic mass model**: the baryonic rotation velocity is
+  `v_bar^2 = |V_gas|V_gas + Y_disk|V_disk|V_disk + Y_bul|V_bul|V_bul`,
+  combining the SPARC rotmod components (tabulated at M/L = 1) with
+  stellar mass-to-light ratios `Y_disk = 0.5` and `Y_bul = 0.7`
+  Msun/Lsun at 3.6 um (McGaugh et al. 2016). The signed-square form
+  preserves the sign convention of the catalogue components. The
+  baryonic acceleration is `g_bar = v_bar^2 / r`, which feeds the `r_t`
+  definition below. `Y_disk` and `Y_bul` are registered values, not
+  fitted.
 - **Transition radius `r_t`**: smallest radius such that
   `g_obs(r)/g_bar(r) >= 1.2` holds at r_t and at no less than the
   persistence fraction `f` of measured points at `r >= r_t`. `r_t` is
