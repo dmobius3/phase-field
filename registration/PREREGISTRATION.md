@@ -71,10 +71,10 @@ Applied uniformly, from the SPARC catalog:
   finite `R_flat` exists within the measured radial range, evaluated at
   the primary-cell parameters (5% flatness tolerance, persistence
   `f = 0.80`), and its SPARC quality flag is 1 or 2; otherwise `rising`.
-  This label is the ground truth for prediction 4. It is derived from the rotation curve and the
-  SPARC quality flag only, never from `T/T_c`, and is assigned before any
-  ROC curve is computed. Using the trigger index to set the label would
-  make prediction 4 circular.
+  This label is the ground truth for prediction 4. It is derived from
+  the rotation curve and the SPARC quality flag only, never from
+  `T/T_c`, and is assigned before any ROC curve is computed. Using the
+  trigger index to set the label would make prediction 4 circular.
 
 ## Registered predictions
 
