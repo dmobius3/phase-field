@@ -23,6 +23,8 @@ import matplotlib  # noqa: E402
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
+from scipy.stats import fisher_exact  # noqa: E402
+
 from coherence.nulls import NULL_MODELS, null_predictor, ols_fit  # noqa: E402
 from coherence.nulls import roc_auc, spearman  # noqa: E402
 
@@ -128,10 +130,11 @@ def figure_trigger_roc(rows):
             fontsize=13, fontweight="bold")
     ax.legend(loc="lower right")
 
-    # confusion matrix at the T/T_c = 1 decision boundary
+    # confusion matrix and Fisher exact test at the T/T_c = 1 boundary
     predicted = scores >= 1.0
     cm = np.array([[np.sum(~predicted & ~labels), np.sum(predicted & ~labels)],
                    [np.sum(~predicted & labels), np.sum(predicted & labels)]])
+    _, fisher_p = fisher_exact(cm)
     axc.imshow(cm, cmap="Blues")
     for i in range(2):
         for j in range(2):
@@ -141,7 +144,7 @@ def figure_trigger_roc(rows):
     axc.set_xticklabels(["pred. rising", "pred. flat"])
     axc.set_yticks([0, 1])
     axc.set_yticklabels(["rising", "flat"])
-    axc.set_title(r"Confusion at $T/T_c = 1$")
+    axc.set_title(f"Confusion at $T/T_c = 1$\nFisher exact p = {fisher_p:.3g}")
     fig.tight_layout()
     fig.savefig(FIGURES / "fig3_trigger_roc.png", dpi=150)
     plt.close(fig)

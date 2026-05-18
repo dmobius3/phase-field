@@ -26,9 +26,11 @@ Applied uniformly, from the SPARC catalog:
 
 - Include: quality flag 1 or 2.
 - Include: inclination >= 30 degrees.
-- Exclude: rising or falling rotation curves at the last measured point
-  (for the radius-correlation tests; rising-curve galaxies are retained
-  as a separate sub-population for the threshold-prediction test).
+- Exclude from the radius-correlation tests (predictions 1-3): galaxies
+  with no finite `R_flat`, i.e. those not labeled `flat` by the
+  kinematic-label definition below. Rising-curve galaxies are retained
+  as a separate sub-population for the threshold-prediction test
+  (prediction 4).
 - R_flat analysis only: include a galaxy in the R_flat / eta_flat
   analysis only if its representative per-point fractional velocity
   error errV/v_c < 0.03. R_flat is biased and unreliable when per-point

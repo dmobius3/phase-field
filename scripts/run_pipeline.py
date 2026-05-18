@@ -16,9 +16,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 import numpy as np  # noqa: E402
+from scipy.stats import fisher_exact  # noqa: E402
 
 from coherence import loaders  # noqa: E402
-from coherence.nulls import beats_nulls, ols_fit, roc_auc, spearman  # noqa: E402
+from coherence.nulls import (beats_nulls, odr_slope, ols_fit,  # noqa: E402
+                             roc_auc, spearman)
 from coherence.radii import (flat_onset_radius, rflat_measurable,  # noqa: E402
                              transition_radius)
 from coherence.ratios import median_within, scatter_chi2  # noqa: E402
@@ -38,7 +40,9 @@ PRIMARY = {"ratio": 1.2, "tol": 0.05, "persistence": 0.80}
 SIGMA_PRED = 0.443
 SLOPE_INTERVAL = (0.7, 1.3)
 PRECISION_WINDOW = (0.75, 1.25)
+COARSE_GATE = (0.5, 2.0)
 AUC_MIN = 0.7
+CLOSURE_MAX_BELOW = 0.05  # max fraction of flat-curve galaxies with T/T_c < 1
 ERRV_KMS = 4.0  # representative per-point error; Phase 1 may use per-galaxy errV
 MIN_FIT = 10    # minimum galaxies for a correlation fit
 
@@ -109,9 +113,10 @@ def kinematic_labels(sample):
 
 def _line_prediction(x, y):
     """Slope in the registered interval, intercept ~0 at 2 sigma,
-    significant Spearman correlation."""
+    significant Spearman correlation. OLS is the registered gate; the
+    ODR slope is recorded alongside as a robustness check."""
     if len(x) < MIN_FIT:
-        return {"passed": False, "slope": None}
+        return {"passed": False, "slope": None, "odr_slope": None}
     x, y = np.asarray(x, float), np.asarray(y, float)
     fit = ols_fit(x, y)
     _, p = spearman(x, y)
@@ -119,20 +124,25 @@ def _line_prediction(x, y):
     intercept_ok = abs(fit["intercept"]) <= 2.0 * fit["intercept_se"]
     return {"passed": bool(slope_ok and intercept_ok and p < 0.01),
             "slope": fit["slope"], "intercept": fit["intercept"],
-            "spearman_p": float(p)}
+            "spearman_p": float(p), "odr_slope": odr_slope(x, y)}
 
 
 def _ratio_prediction(eta_t, eta_flat):
     """Location within the precision window and scatter consistent with
-    sigma_pred, for both eta_t and eta_flat."""
+    sigma_pred, for both eta_t and eta_flat. The coarse gate [0.5, 2.0]
+    is recorded but does not affect the pass/fail verdict; the precision
+    window carries the falsification weight."""
     if len(eta_t) < MIN_FIT or len(eta_flat) < MIN_FIT:
         return {"passed": False}
     loc_t = median_within(eta_t, PRECISION_WINDOW)[0]
     loc_f = median_within(eta_flat, PRECISION_WINDOW)[0]
+    coarse_t = median_within(eta_t, COARSE_GATE)[0]
+    coarse_f = median_within(eta_flat, COARSE_GATE)[0]
     p_t = scatter_chi2(eta_t, SIGMA_PRED)[2]
     p_f = scatter_chi2(eta_flat, SIGMA_PRED)[2]
     return {"passed": bool(loc_t and loc_f and p_t >= 0.05 and p_f >= 0.05),
             "location_eta_t": bool(loc_t), "location_eta_flat": bool(loc_f),
+            "coarse_eta_t": bool(coarse_t), "coarse_eta_flat": bool(coarse_f),
             "scatter_p_eta_t": float(p_t), "scatter_p_eta_flat": float(p_f)}
 
 
@@ -176,6 +186,10 @@ def evaluate_cell(sample, labels, triggers, ratio, tol, persistence):
             "prediction_3": pred3["passed"], "prediction_4": pred4,
             "n_flat": len(flat), "n_rflat_measurable": len(measurable),
             "slope_r_t": pred1["slope"], "slope_R_flat": line2["slope"],
+            "odr_slope_r_t": pred1["odr_slope"],
+            "odr_slope_R_flat": line2["odr_slope"],
+            "coarse_eta_t": pred3.get("coarse_eta_t"),
+            "coarse_eta_flat": pred3.get("coarse_eta_flat"),
             "auc": auc}
 
 
@@ -195,6 +209,40 @@ def write_primary_detail(sample, labels, triggers):
     (RESULTS / "primary_cell.json").write_text(json.dumps(rows, indent=2))
 
 
+def closure_and_contingency(sample, labels, triggers):
+    """Closure-identity test and the prediction-4 contingency table.
+
+    Neither depends on the sensitivity-grid cell: the trigger index and
+    the kinematic labels are fixed. The closure test counts flat-curve
+    galaxies below T/T_c = 1 (registered: no more than 5%). The 2x2
+    contingency table at the T/T_c = 1 boundary and its Fisher exact
+    test are reported alongside the prediction-4 AUC.
+    """
+    names = [g["name"] for g in sample]
+    trig = np.array([triggers[n] for n in names], dtype=float)
+    flat = np.array([labels[n] for n in names], dtype=bool)
+
+    flat_trig = trig[flat]
+    frac_below = (float(np.mean(flat_trig < 1.0)) if flat_trig.size
+                  else float("nan"))
+    closure = {"n_flat_curve": int(flat.sum()),
+               "fraction_below_unity": frac_below,
+               "max_allowed": CLOSURE_MAX_BELOW,
+               "passed": bool(frac_below <= CLOSURE_MAX_BELOW)}
+
+    predicted_flat = trig >= 1.0
+    table = [[int(np.sum(~predicted_flat & ~flat)),
+              int(np.sum(predicted_flat & ~flat))],
+             [int(np.sum(~predicted_flat & flat)),
+              int(np.sum(predicted_flat & flat))]]
+    _, fisher_p = fisher_exact(table)
+    contingency = {"table": table, "rows": ["rising", "flat"],
+                   "columns": ["predicted_rising", "predicted_flat"],
+                   "fisher_exact_p": float(fisher_p),
+                   "auc": float(roc_auc(trig, flat))}
+    return closure, contingency
+
+
 def main():
     if not (DATA / "SPARC_Lelli2016c.mrt").exists():
         print("No SPARC data in data/. run_pipeline.py is Phase 1 code.")
@@ -208,6 +256,7 @@ def main():
     triggers = {g["name"]: trigger_ratio(
         g["rad"], g["vobs"], coherence_length_kpc(g["v_c"]), g["v_c"])
         for g in sample}
+    closure, contingency = closure_and_contingency(sample, labels, triggers)
 
     grid = [evaluate_cell(sample, labels, triggers, r, t, p)
             for r, t, p in product(RATIO_GRID, TOL_GRID, PERSISTENCE_GRID)]
@@ -216,6 +265,8 @@ def main():
 
     summary = {"n_cells": len(grid), "primary": PRIMARY,
                "verdict_stable": stable, "all_stable": all(stable.values()),
+               "closure_identity": closure,
+               "prediction_4_contingency": contingency,
                "cells": grid}
     (RESULTS / "sensitivity_grid.json").write_text(json.dumps(summary, indent=2))
     write_primary_detail(sample, labels, triggers)
@@ -225,6 +276,10 @@ def main():
                    and c["persistence"] == PRIMARY["persistence"])
     print("primary cell: "
           + ", ".join(f"P{i + 1}={primary[keys[i]]}" for i in range(4)))
+    print(f"closure identity: {closure['fraction_below_unity']:.3f} of "
+          f"flat-curve galaxies below T/T_c=1 (pass={closure['passed']})")
+    print(f"prediction 4: AUC={contingency['auc']:.3f}, "
+          f"Fisher exact p={contingency['fisher_exact_p']:.3g}")
     print(f"all 27-cell verdicts stable: {summary['all_stable']}")
     print(f"results written to {RESULTS}")
 

@@ -45,6 +45,23 @@ def ols_fit(x, y):
             "r": float(res.rvalue), "p": float(res.pvalue)}
 
 
+def odr_slope(x, y):
+    """Orthogonal-distance-regression slope of y on x.
+
+    Reported as a robustness check on the OLS slope (PREREGISTRATION.md,
+    prediction 1). ODR accounts for error in both variables; OLS, the
+    registered method, is subject to regression dilution toward zero.
+    """
+    from scipy import odr
+
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    fit = odr.ODR(odr.Data(x, y),
+                  odr.Model(lambda beta, t: beta[0] * t + beta[1]),
+                  beta0=[1.0, 0.0]).run()
+    return float(fit.beta[0])
+
+
 def spearman(x, y):
     """Spearman rank correlation, returns ``(rho, p)``."""
     rho, p = stats.spearmanr(x, y)

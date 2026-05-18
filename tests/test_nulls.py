@@ -1,7 +1,7 @@
 import numpy as np
 
-from coherence.nulls import (beats_nulls, ols_fit, partial_spearman,
-                             roc_auc, spearman)
+from coherence.nulls import (beats_nulls, odr_slope, ols_fit,
+                             partial_spearman, roc_auc, spearman)
 from coherence.scales import A0
 
 
@@ -10,6 +10,11 @@ def test_ols_recovers_known_line():
     fit = ols_fit(x, 2.0 * x + 1.0)
     assert np.isclose(fit["slope"], 2.0)
     assert np.isclose(fit["intercept"], 1.0)
+
+
+def test_odr_slope_recovers_known_line():
+    x = np.linspace(1.0, 10.0, 50)
+    assert np.isclose(odr_slope(x, 2.0 * x + 1.0), 2.0, rtol=1e-3)
 
 
 def test_partial_spearman_removes_spurious_correlation():
