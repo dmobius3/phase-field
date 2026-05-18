@@ -1,6 +1,7 @@
 import numpy as np
 
-from coherence.nulls import beats_nulls, ols_fit, partial_spearman, spearman
+from coherence.nulls import (beats_nulls, ols_fit, partial_spearman,
+                             roc_auc, spearman)
 from coherence.scales import A0
 
 
@@ -21,6 +22,15 @@ def test_partial_spearman_removes_spurious_correlation():
     rho_partial, _ = partial_spearman(x, y, z)
     assert rho_raw > 0.9
     assert abs(rho_partial) < 0.3
+
+
+def test_roc_auc_separable_and_reversed():
+    scores = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    labels = np.array([False, False, False, True, True, True])
+    assert roc_auc(scores, labels) == 1.0      # perfectly separable
+    assert roc_auc(-scores, labels) == 0.0     # perfectly anti-separable
+    mixed = np.array([True, False, True, False, True, False])
+    assert 0.0 <= roc_auc(scores, mixed) <= 1.0
 
 
 def test_vc_squared_null_is_decisive():

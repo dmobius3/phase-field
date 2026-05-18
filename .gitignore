@@ -44,3 +44,9 @@ tmp/
 # SPARC data: fetched by scripts/fetch_data.py, not redistributed here
 data/*
 !data/.gitkeep
+
+# Generated outputs
+results/*
+!results/.gitkeep
+figures/*
+!figures/.gitkeep

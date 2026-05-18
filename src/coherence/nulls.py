@@ -66,6 +66,25 @@ def partial_spearman(x, y, z):
     return float(rho), float(p)
 
 
+def roc_auc(scores, labels):
+    """ROC AUC of continuous ``scores`` against binary ``labels``.
+
+    ``labels`` is True for the positive class. AUC is the normalised
+    Mann-Whitney U statistic, with ties handled by average ranks.
+    Returns NaN if either class is empty. Used to score prediction 4
+    (the trigger index as a predictor of kinematic morphology).
+    """
+    scores = np.asarray(scores, dtype=float)
+    labels = np.asarray(labels, dtype=bool)
+    n_pos = int(labels.sum())
+    n_neg = int((~labels).sum())
+    if n_pos == 0 or n_neg == 0:
+        return float("nan")
+    ranks = stats.rankdata(scores)
+    u = ranks[labels].sum() - n_pos * (n_pos + 1) / 2.0
+    return float(u / (n_pos * n_neg))
+
+
 def beats_nulls(radius, L_f, catalog, partial_p_max: float = 0.01):
     """Prediction-2 null-model criterion.
 
