@@ -1,6 +1,7 @@
 # Pre-Registration
 
-**Status:** DRAFT. Finalized and frozen at git tag `v1.0-preregistration`.
+**Status:** Final. Frozen at git tag `v1.0-preregistration` (2026-05-17).
+Nothing in this document changes after this tag.
 
 This document fixes the analysis before any SPARC data is downloaded. The
 pipeline code, the thresholds below, the sample cuts, and the acceptance
@@ -115,9 +116,8 @@ physical content.
 
 ## Acceptance criteria
 
-Every interval and test statistic below is frozen at the tag. The numeric
-values are provisional in this draft and may be adjusted before the tag;
-once frozen, nothing changes after data contact.
+Every interval and test statistic below is frozen at the tag
+`v1.0-preregistration`. Nothing changes after data contact.
 
 **Prediction 1 (transition radius).** Ordinary-least-squares fit of `r_t`
 on `L_f`: registered slope interval `[0.7, 1.3]`, registered intercept
