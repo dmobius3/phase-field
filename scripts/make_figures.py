@@ -111,9 +111,32 @@ def _roc_curve(scores, labels):
 
 
 def figure_trigger_roc(rows):
-    """Figure 3: ROC for the trigger index, plus the 2x2 confusion matrix."""
+    """Figure 3: ROC for the trigger index plus the confusion matrix, or,
+    when the sample has no rising-curve galaxies, an informative panel
+    recording that prediction 4 is untestable on this sample."""
     scores = np.array([r["trigger_ratio"] for r in rows], dtype=float)
     labels = np.array([r["flat"] for r in rows], dtype=bool)
+    n_flat = int(labels.sum())
+    n_rising = int((~labels).sum())
+
+    if n_flat == 0 or n_rising == 0:
+        fig, ax = plt.subplots(figsize=(7.0, 4.6))
+        ax.axis("off")
+        ax.text(0.5, 0.70, "Prediction 4: untestable on this sample",
+                ha="center", fontsize=14, fontweight="bold")
+        ax.text(0.5, 0.50,
+                "ROC AUC needs both classes. The quality-filtered sample\n"
+                "has no rising-curve galaxies, so there is no negative\n"
+                "class for the trigger index to discriminate against.",
+                ha="center", fontsize=10.5)
+        ax.text(0.5, 0.22,
+                "filtered sample:  %d flat,  %d rising" % (n_flat, n_rising),
+                ha="center", fontsize=12, fontweight="bold", color="#c44e52")
+        fig.tight_layout()
+        fig.savefig(FIGURES / "fig3_trigger_roc.png", dpi=150)
+        plt.close(fig)
+        return
+
     auc = roc_auc(scores, labels)
     fpr, tpr = _roc_curve(scores, labels)
 
