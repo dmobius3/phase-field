@@ -1,0 +1,51 @@
+{
+  "note": "Post-hoc robustness checks, NOT part of the registered analysis (tag v1.0-preregistration).",
+  "n_quality_filtered": 123,
+  "n_flat": 123,
+  "upsilon_sweep": [
+    {
+      "Y_disk": 0.3,
+      "n": 123,
+      "ols_slope_rt_Lf": 0.15922670431075106,
+      "spearman_rt_Lf": 0.5252065742661407,
+      "spearman_rt_Mb": 0.5808774658250379,
+      "L_f_beats_M_b": false
+    },
+    {
+      "Y_disk": 0.5,
+      "n": 123,
+      "ols_slope_rt_Lf": 0.23205058333465983,
+      "spearman_rt_Lf": 0.6126729605742376,
+      "spearman_rt_Mb": 0.6795168494623691,
+      "L_f_beats_M_b": false
+    },
+    {
+      "Y_disk": 0.7,
+      "n": 121,
+      "ols_slope_rt_Lf": 0.43718379804998464,
+      "spearman_rt_Lf": 0.6137740889043131,
+      "spearman_rt_Mb": 0.702545882032893,
+      "L_f_beats_M_b": false
+    }
+  ],
+  "coverage": {
+    "n": 123,
+    "median_Rlast_over_Lf": 4.26642155400082,
+    "min": 0.43852947853990026,
+    "max": 16.270971025139847,
+    "frac_Lf_within_data": 0.975609756097561
+  },
+  "label_stability": {
+    "n_combinations": 9,
+    "n_galaxies": 123,
+    "flat_in_all": 96,
+    "rising_in_all": 0,
+    "label_flips": 27
+  },
+  "per_galaxy_errV": {
+    "n": 123,
+    "registered_fixed_4kms": 56,
+    "per_galaxy_errV": 49,
+    "in_both": 35
+  }
+}
