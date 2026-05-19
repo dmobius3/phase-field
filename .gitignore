@@ -45,11 +45,16 @@ tmp/
 data/*
 !data/.gitkeep
 
-# Generated outputs. The registered run's output is kept under version
-# control as the result of record; figures are regenerable from it.
+# Generated outputs kept under version control as the analysis record:
+# the registered run output, the post-hoc robustness output, and the
+# figures generated from them. Anything else here stays ignored.
 results/*
 !results/.gitkeep
 !results/sensitivity_grid.json
 !results/primary_cell.json
+!results/robustness.json
 figures/*
 !figures/.gitkeep
+!figures/fig1_eta_flat_histogram.png
+!figures/fig2_rt_vs_Lf.png
+!figures/fig3_trigger_roc.png
