@@ -45,8 +45,11 @@ tmp/
 data/*
 !data/.gitkeep
 
-# Generated outputs
+# Generated outputs. The registered run's output is kept under version
+# control as the result of record; figures are regenerable from it.
 results/*
 !results/.gitkeep
+!results/sensitivity_grid.json
+!results/primary_cell.json
 figures/*
 !figures/.gitkeep
