@@ -25,7 +25,6 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 import numpy as np  # noqa: E402
-from astropy.table import Table  # noqa: E402
 
 from coherence.synthetic import make_galaxy  # noqa: E402
 
@@ -69,6 +68,24 @@ def _specs():
     return specs
 
 
+def _write_master(rows):
+    """Write a synthetic master table in the whitespace-delimited SPARC
+    Table1 layout (19 columns; a title line, a dashed separator, then the
+    data rows). Each ``rows`` entry is (name, quality, inc, vflat, rdisk,
+    reff, mhi, l36); the eleven SPARC columns the pipeline does not use
+    are written as fillers.
+    """
+    lines = ["Synthetic SPARC-format master table -- NOT SPARC data",
+             "-" * 80]
+    for name, quality, inc, vflat, rdisk, reff, mhi, l36 in rows:
+        lines.append(
+            "%-11s %2d %6.2f %5.2f %2d %5.1f %4.1f %8.4f %7.4f %5.2f "
+            "%8.2f %6.3f %8.2f %8.4f %5.2f %6.1f %5.1f %3d %s" % (
+                name, 10, 10.0, 1.0, 1, inc, 3.0, l36, 0.01, reff,
+                100.0, rdisk, 200.0, mhi, 5.0, vflat, 3.0, quality, "Dry"))
+    MASTER.write_text("\n".join(lines) + "\n")
+
+
 def build_synthetic():
     """Write the synthetic master table and rotation-curve files."""
     DATA.mkdir(exist_ok=True)
@@ -85,17 +102,7 @@ def build_synthetic():
     # edge case: a rotation-curve file with no master row
     _write_rotmod("DryOrphan", make_galaxy("flat", v_c=150.0))
 
-    cols = list(zip(*rows))
-    table = Table()
-    table["Galaxy"] = list(cols[0])
-    table["Q"] = np.array(cols[1], dtype=int)
-    table["Inc"] = np.array(cols[2], dtype=float)
-    table["Vflat"] = np.array(cols[3], dtype=float)
-    table["Rdisk"] = np.array(cols[4], dtype=float)
-    table["Reff"] = np.array(cols[5], dtype=float)
-    table["MHI"] = np.array(cols[6], dtype=float)
-    table["L[3.6]"] = np.array(cols[7], dtype=float)
-    table.write(MASTER, format="mrt", overwrite=True)
+    _write_master(rows)
     return len(rows)
 
 

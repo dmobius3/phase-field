@@ -14,6 +14,11 @@ import pandas as pd
 ROTMOD_COLUMNS = ["rad", "vobs", "e_vobs", "vgas", "vdisk", "vbul",
                   "sb_disk", "sb_bul"]
 
+# SPARC Table1 (SPARC_Lelli2016c.mrt) columns, in file order.
+MASTER_COLUMNS = ["Galaxy", "T", "D", "e_D", "f_D", "Inc", "e_Inc",
+                  "L[3.6]", "e_L[3.6]", "Reff", "SBeff", "Rdisk", "SBdisk",
+                  "MHI", "RHI", "Vflat", "e_Vflat", "Q", "Ref"]
+
 
 def load_rotation_curve(path):
     """Parse a SPARC ``*_rotmod.dat`` file.
@@ -30,13 +35,27 @@ def load_rotation_curve(path):
 def load_master(path):
     """Parse the SPARC master table ``SPARC_Lelli2016c.mrt``.
 
-    The master table is a CDS machine-readable table; astropy's MRT
-    reader handles the header. Returns a pandas DataFrame.
+    The file is an MRT with a byte-by-byte header, but its data rows are
+    whitespace-delimited and do not align byte-for-byte with the declared
+    column widths, so astropy's strict fixed-width MRT reader fails on it.
+    The data section, after the last dashed separator line, is read as
+    whitespace-delimited columns in the documented Table1 order
+    (``MASTER_COLUMNS``); the trailing reference field absorbs any extra
+    tokens. Returns a pandas DataFrame of strings; callers convert the
+    columns they use.
     """
-    from astropy.io import ascii as astropy_ascii
-
-    table = astropy_ascii.read(str(path), format="mrt")
-    return table.to_pandas()
+    lines = Path(path).read_text().splitlines()
+    seps = [i for i, ln in enumerate(lines)
+            if ln.strip() and set(ln.strip()) == {"-"}]
+    start = seps[-1] + 1 if seps else 0
+    n_fixed = len(MASTER_COLUMNS) - 1  # all columns but the trailing Ref
+    rows = []
+    for line in lines[start:]:
+        parts = line.split()
+        if len(parts) < len(MASTER_COLUMNS):
+            continue
+        rows.append(parts[:n_fixed] + [" ".join(parts[n_fixed:])])
+    return pd.DataFrame(rows, columns=MASTER_COLUMNS)
 
 
 def rotation_curve_files(data_dir):
