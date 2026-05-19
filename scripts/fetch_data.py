@@ -17,7 +17,7 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-SPARC_BASE = "http://astroweb.cwru.edu/SPARC/"
+SPARC_BASE = "https://astroweb.cwru.edu/SPARC/"
 MASTER_TABLE = "SPARC_Lelli2016c.mrt"
 ROTMOD_ARCHIVE = "Rotmod_LTG.zip"
 
