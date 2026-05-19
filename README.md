@@ -21,6 +21,29 @@ The theoretical motivation lives in the companion working note
 `files/working/files/sparc-phase-field.md`). This repository is the
 analysis: the pipeline, the frozen pre-registration, and the figures.
 
+## Result
+
+The pre-registered pipeline was run once against SPARC on 2026-05-19.
+The answer to the question above is **no.** All four registered
+predictions fail, and the verdicts are stable across all 27
+sensitivity-grid cells, so the outcome does not depend on any analyst
+threshold:
+
+- `r_t` and `R_flat` track `L_f` only weakly (OLS slopes ~0.23 and
+  ~0.33, far below the registered [0.7, 1.3]) and in opposite
+  directions: `r_t` ~ 0.38 `L_f`, `R_flat` ~ 1.26 `L_f`.
+- The closure identity fails: 53.7% of flat-curve galaxies fall below
+  `T/T_c = 1`, against a registered tolerance of 5%.
+- The trigger-index prediction is untestable on this sample (the
+  quality cuts leave no rising-curve galaxies).
+
+A post-hoc check finds `r_t` correlates with baryonic mass more tightly
+than with `L_f`, robust across the disk mass-to-light range. SPARC does
+not support `L_f = v_c^2/a_0` as a galactic coherence radius. Full
+numbers are in `results/`; the diagnosis is in the companion working
+note. This is a pre-registered negative result: locked pipeline,
+archived with a DOI, run once.
+
 ## Pre-registration protocol
 
 This is a locked-pipeline blind analysis of pre-existing data. SPARC has
